@@ -1,16 +1,12 @@
 package com.willwei.gateway.test;
 
 
-import com.willwei.gateway.session.SessionServer;
-import io.netty.channel.Channel;
+import com.willwei.gateway.session.Configuration;
+import com.willwei.gateway.session.GenericReferenceSessionFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+
 
 @Slf4j
 public class ApiTest {
@@ -18,19 +14,27 @@ public class ApiTest {
 
     @Test
     public void test() throws ExecutionException, InterruptedException {
-        SessionServer server = new SessionServer();
+        Configuration configuration = new Configuration();
 
-        Future<Channel> future = Executors.newFixedThreadPool(2).submit(server);
-        Channel channel = future.get();
+        // 给 configuration 添加泛化调用的接口方法信息
+        configuration.addGenericReference("api-gateway-test", "com.willwei.gateway.rpc.IActivityBooth", "sayHi");
 
-        if (null == channel) throw new RuntimeException("netty server start error channel is null");
+        GenericReferenceSessionFactoryBuilder builder = new GenericReferenceSessionFactoryBuilder();
+        builder.build(configuration);
 
-        while (!channel.isActive()) {
-            log.info("NettyServer启动服务 ...");
-            Thread.sleep(500);
-        }
-        log.info("NettyServer启动服务完成 {}", channel.localAddress());
+        log.info("test方法服务启动完成");
 
         Thread.sleep(Long.MAX_VALUE);
+
+//        SessionServer server = new SessionServer(configuration);
+//        Future<Channel> future = Executors.newFixedThreadPool(2).submit(server);
+//        Channel channel = future.get();
+//        if (null == channel) throw new RuntimeException("netty server start error channel is null");
+//        while (!channel.isActive()) {
+//            log.info("NettyServer启动服务 ...");
+//            Thread.sleep(500);
+//        }
+//        log.info("NettyServer启动服务完成 {}", channel.localAddress());
+//        Thread.sleep(Long.MAX_VALUE);
     }
 }

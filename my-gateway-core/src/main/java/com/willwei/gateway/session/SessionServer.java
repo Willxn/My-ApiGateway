@@ -20,6 +20,11 @@ public class SessionServer implements Callable<Channel> {
     private final EventLoopGroup boss = new NioEventLoopGroup(1);
     private final EventLoopGroup work = new NioEventLoopGroup();
     private Channel channel;
+    private final Configuration configuration;
+
+    public SessionServer(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     @Override
     public Channel call() throws Exception {
@@ -29,7 +34,7 @@ public class SessionServer implements Callable<Channel> {
             b.group(boss, work)
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 128)
-                    .childHandler(new SessionChannelInitializer());
+                    .childHandler(new SessionChannelInitializer(configuration));
 
             channelFuture = b.bind(new InetSocketAddress(7397)).syncUninterruptibly();
             this.channel = channelFuture.channel();
