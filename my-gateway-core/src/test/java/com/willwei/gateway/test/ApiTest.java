@@ -25,14 +25,25 @@ public class ApiTest {
 
         // 1. 创建配置信息加载注册
         Configuration configuration = new Configuration();
-        HttpStatement httpStatement = new HttpStatement(
+        HttpStatement httpStatement01 = new HttpStatement(
                 "api-gateway-test",
                 "com.willwei.gateway.rpc.IActivityBooth",
                 "sayHi",
+                "java.lang.String",
                 "/wg/activity/sayHi",
                 HttpCommandType.GET
         );
-        configuration.addMapper(httpStatement);
+        HttpStatement httpStatement02 = new HttpStatement(
+                "api-gateway-test",
+                "com.willwei.gateway.rpc.IActivityBooth",
+                "insert",
+                "com.willwei.gateway.rpc.dto.XReq",
+                "/wg/activity/insert",
+                HttpCommandType.POST
+        );
+
+        configuration.addMapper(httpStatement01);
+        configuration.addMapper(httpStatement02);
 
         // 2. 基于配置构建会话工厂
         DefaultGatewaySessionFactory gatewaySessionFactory = new DefaultGatewaySessionFactory(configuration);

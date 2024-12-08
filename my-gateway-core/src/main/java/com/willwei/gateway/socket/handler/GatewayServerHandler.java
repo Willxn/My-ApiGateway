@@ -6,10 +6,13 @@ import com.willwei.gateway.bind.IGenericReference;
 import com.willwei.gateway.session.GatewaySession;
 import com.willwei.gateway.session.defaults.DefaultGatewaySessionFactory;
 import com.willwei.gateway.socket.BaseHandler;
+import com.willwei.gateway.socket.agreement.RequestParser;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Map;
 
 @Slf4j
 public class GatewayServerHandler extends BaseHandler<FullHttpRequest> {
@@ -23,14 +26,24 @@ public class GatewayServerHandler extends BaseHandler<FullHttpRequest> {
     protected void session(ChannelHandlerContext ctx, Channel channel, FullHttpRequest request) {
         log.info("网关接收请求 uri：{} method：{}", request.uri(), request.method());
 
+        // 解析请求参数
+        Map<String, Object> requestObj = new RequestParser(request).parse();
+
         // 返回信息控制：简单处理
-        String uri = request.uri();
+        //http://localhost:7397/wg/activity/sayHi?str=10001
+        // 返回信息控制：简单处理
+        String uri = request.uri();       //   uri: /wg/activity/sayHi?str=10001
+        int index = uri.indexOf("?");     //   uri: /wg/activity/sayHi
+        uri = index > 0 ?  uri.substring(0, index) : uri;
         if (uri.equals("/favicon.ico")) return;
 
         // 从网关会话工厂中创建一个网关会话对象
-        GatewaySession gatewaySession = gatewaySessionFactory.openSession();
+        GatewaySession gatewaySession = gatewaySessionFactory.openSession(uri);
+        //拿到 IGenericReference 的代理对象
         IGenericReference reference = gatewaySession.getMapper(uri);
-        String result = reference.invoke("test") + " " + System.currentTimeMillis();
+        //调用代理对象的invoke方法，等同于调用 MapperProxy 的 intercept 方法
+        log.info("=================" + requestObj.toString());
+        String result = reference.invoke(requestObj) + " " + System.currentTimeMillis();
 
         // 返回信息处理
         DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);

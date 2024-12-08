@@ -3,10 +3,12 @@ package com.willwei.gateway.bind;
 import com.willwei.gateway.mapping.HttpStatement;
 import com.willwei.gateway.session.Configuration;
 import com.willwei.gateway.session.GatewaySession;
-
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @description 泛化调用注册器类
+ */
 public class MapperRegistry {
 
     private final Configuration configuration;
