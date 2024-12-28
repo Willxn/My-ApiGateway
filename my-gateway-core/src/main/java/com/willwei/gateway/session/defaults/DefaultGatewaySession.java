@@ -3,6 +3,7 @@ package com.willwei.gateway.session.defaults;
 import com.willwei.gateway.bind.IGenericReference;
 import com.willwei.gateway.datasource.Connection;
 import com.willwei.gateway.datasource.DataSource;
+import com.willwei.gateway.executor.Executor;
 import com.willwei.gateway.mapping.HttpStatement;
 import com.willwei.gateway.session.Configuration;
 import com.willwei.gateway.session.GatewaySession;
@@ -24,25 +25,25 @@ import java.util.Map;
 public class DefaultGatewaySession implements GatewaySession {
     private final Configuration configuration;
     private final String uri;
-    private final DataSource dataSource;
+    private final Executor executor;
 
-    public DefaultGatewaySession(Configuration configuration, String uri, DataSource dataSource) {
+    public DefaultGatewaySession(Configuration configuration, String uri, Executor executor) {
         this.configuration = configuration;
         this.uri = uri;
-        this.dataSource = dataSource;
+        this.executor = executor;
     }
 
 
     @Override
     public Object get(String methodName, Map<String, Object> paramMap) {
         HttpStatement httpStatement = configuration.getHttpStatement(uri);
-        String parameterType = httpStatement.getParameterType();
-        Connection connection = dataSource.getConnection();
+        try {
+            return executor.exec(httpStatement, paramMap);
+        } catch (Exception e) {
+            throw new RuntimeException("Error exec get. Cause: " + e);
+        }
 
-        return connection.execute(
-                methodName,
-                new String[]{parameterType},
-                SimpleTypeUtil.isSimpleType(parameterType)? paramMap.values().toArray() : new Object[]{paramMap});
+
     }
 
     @Override

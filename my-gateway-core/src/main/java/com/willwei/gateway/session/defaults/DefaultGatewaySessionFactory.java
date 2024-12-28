@@ -3,6 +3,7 @@ package com.willwei.gateway.session.defaults;
 import com.willwei.gateway.datasource.DataSource;
 import com.willwei.gateway.datasource.DataSourceFactory;
 import com.willwei.gateway.datasource.unpooled.UnpooledDataSourceFactory;
+import com.willwei.gateway.executor.Executor;
 import com.willwei.gateway.session.Configuration;
 import com.willwei.gateway.session.GatewaySession;
 import com.willwei.gateway.session.GatewaySessionFactory;
@@ -23,8 +24,10 @@ public class DefaultGatewaySessionFactory implements GatewaySessionFactory {
         // 设置属性，UnpooledDataSourceFactory 默认是 调用 Dubbo
         dataSourceFactory.setProperties(configuration, uri);
         DataSource dataSource = dataSourceFactory.getDataSource();
-
-        return new DefaultGatewaySession(configuration, uri, dataSource);
+        // 创建执行器
+        Executor executor = configuration.newExecutor(dataSource.getConnection());
+        // 创建会话：DefaultGatewaySession
+        return new DefaultGatewaySession(configuration, uri, executor);
     }
 
 }

@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class HTTPConnection implements Connection {
     @Override
-    public Object execute(String var1, String[] parameterTypes, Object[] var3) {
+    public Object execute(String var1, String[] parameterTypes, String[] parameterNames, Object[] var3) {
         return null;
     }
 }

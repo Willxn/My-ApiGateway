@@ -28,6 +28,15 @@ public class RequestParser {
         this.request = request;
     }
 
+    public String getUri(){
+        //http://localhost:7397/wg/activity/sayHi?str=10001
+        String uri = request.uri();       //   uri: /wg/activity/sayHi?str=10001
+        int index = uri.indexOf("?");     //   uri: /wg/activity/sayHi
+        uri = index > 0 ?  uri.substring(0, index) : uri;
+        if (uri.equals("/favicon.ico")) return null;
+        return uri;
+    }
+
     public Map<String, Object> parse() {
         final Map<String, Object> paramMap = new HashMap<>();
         // 解析 GET 请求

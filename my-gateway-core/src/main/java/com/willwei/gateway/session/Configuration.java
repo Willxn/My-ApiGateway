@@ -2,6 +2,9 @@ package com.willwei.gateway.session;
 
 import com.willwei.gateway.bind.IGenericReference;
 import com.willwei.gateway.bind.MapperRegistry;
+import com.willwei.gateway.datasource.Connection;
+import com.willwei.gateway.executor.Executor;
+import com.willwei.gateway.executor.SimpleExecutor;
 import com.willwei.gateway.mapping.HttpStatement;
 import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ReferenceConfig;
@@ -71,4 +74,9 @@ public class Configuration {
     public void addHttpStatement(HttpStatement httpStatement) {
         httpStatements.put(httpStatement.getUri(), httpStatement);
     }
+
+    public Executor newExecutor(Connection connection) {
+        return new SimpleExecutor(this, connection);
+    }
+
 }
